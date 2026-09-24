@@ -30,3 +30,16 @@ def test_parser_collects_prefixes():
     click.Option("+p", is_flag=True).add_to_parser(parser, ctx)
     click.Option("!e", is_flag=True).add_to_parser(parser, ctx)
     assert parser._opt_prefixes == {"-", "--", "+", "!"}
+
+def test_negative_number_as_argument():
+    parser = click.Command("test")
+
+    @click.command()
+    @click.argument("number", type=float)
+    def test(number):
+        click.echo(f"Number received: {number}")
+
+    result = click.testing.CliRunner().invoke(test, ["-1"])
+
+    assert result.exit_code == 0
+    assert "Number received: -1.0" in result.output

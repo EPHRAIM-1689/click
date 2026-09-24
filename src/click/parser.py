@@ -46,6 +46,16 @@ if t.TYPE_CHECKING:
     from .core import Parameter as CoreParameter
 
 V = t.TypeVar("V")
+def _is_number(arg: str) -> bool:
+    try:
+        int(arg, 0)
+    except ValueError:
+        try:
+            float(arg)
+        except ValueError:
+            return False
+
+    return True
 
 
 def _unpack_args(
@@ -332,7 +342,7 @@ class _OptionParser:
             # prefixes are valid.
             if arg == "--":
                 return
-            elif arg[:1] in self._opt_prefixes and arglen > 1:
+            elif arg[:1] in self._opt_prefixes and arglen > 1 and not _is_number(arg):
                 self._process_opts(arg, state)
             elif self.allow_interspersed_args:
                 state.largs.append(arg)
