@@ -31,15 +31,14 @@ def test_parser_collects_prefixes():
     click.Option("!e", is_flag=True).add_to_parser(parser, ctx)
     assert parser._opt_prefixes == {"-", "--", "+", "!"}
 
-def test_negative_number_as_argument():
-    parser = click.Command("test")
-
+@pytest.mark.parametrize("number", ["-1", "-1.5", "-0.5"])
+def test_negative_number_as_argument(number):
     @click.command()
     @click.argument("number", type=float)
     def test(number):
         click.echo(f"Number received: {number}")
 
-    result = click.testing.CliRunner().invoke(test, ["-1"])
+    result = click.testing.CliRunner().invoke(test, [number])
 
     assert result.exit_code == 0
-    assert "Number received: -1.0" in result.output
+    assert f"Number received: {float(number)}" in result.output
